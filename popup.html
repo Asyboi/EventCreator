@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventCreator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>EventCreator</h1>
+    
+    <div id="auth-section">
+      <button id="login-btn" class="btn btn-primary">Sign in with Google</button>
+      <p class="status" id="auth-status"></p>
+      <div id="debug-info" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-size: 11px; display: none;">
+        <strong>Debug Info:</strong><br>
+        <span id="redirect-uri-display"></span><br>
+        <span id="client-id-display"></span>
+      </div>
+      <button id="show-debug-btn" style="margin-top: 5px; padding: 5px; font-size: 11px; background: #e0e0e0; border: none; border-radius: 3px; cursor: pointer;">Show Redirect URI</button>
+    </div>
+
+    <div id="main-section" style="display: none;">
+      <div class="recording-section">
+        <button id="record-btn" class="btn btn-record">
+          <span id="record-icon">🎤</span>
+          <span id="record-text">Start Recording</span>
+        </button>
+        <div id="transcript-display" class="transcript"></div>
+      </div>
+
+      <div class="event-section">
+        <h3>Event Details</h3>
+        <input type="text" id="event-title" placeholder="Event title" />
+        <input type="datetime-local" id="event-start" />
+        <input type="datetime-local" id="event-end" />
+        <textarea id="event-description" placeholder="Description (optional)"></textarea>
+        <button id="create-event-btn" class="btn btn-primary">Create Event</button>
+      </div>
+
+      <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
+    </div>
+
+    <div id="status-message" class="status"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

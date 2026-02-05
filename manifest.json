@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "EventCreator",
+  "version": "1.0.0",
+  "description": "Voice speech-to-text extension to create Google Calendar events",
+  "permissions": [
+    "identity",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "https://accounts.google.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

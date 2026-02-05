@@ -1,0 +1,156 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 400px;
+  min-height: 500px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #f5f5f5;
+}
+
+.container {
+  padding: 20px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+
+.btn-primary {
+  background: #4285f4;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #357ae8;
+}
+
+.btn-secondary {
+  background: #ea4335;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #d33b2c;
+}
+
+.btn-record {
+  background: #34a853;
+  color: white;
+  font-size: 18px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-record:hover {
+  background: #2d8f47;
+}
+
+.btn-record.recording {
+  background: #ea4335;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.recording-section {
+  margin-bottom: 20px;
+}
+
+.transcript {
+  margin-top: 15px;
+  padding: 15px;
+  background: white;
+  border-radius: 6px;
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.event-section {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.event-section input,
+.event-section textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.event-section textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.status {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.status.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status.info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+#status-message {
+  margin-top: 15px;
+}
