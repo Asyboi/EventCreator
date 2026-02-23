@@ -113,6 +113,7 @@ h3 {
 }
 
 .event-section input,
+.event-section select,
 .event-section textarea {
   width: 100%;
   padding: 10px;
@@ -121,6 +122,27 @@ h3 {
   border-radius: 4px;
   font-size: 14px;
   font-family: inherit;
+}
+
+.calendar-color-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.calendar-color-row #calendar-select {
+  flex: 1;
+  cursor: pointer;
+}
+
+.calendar-color-row #color-select {
+  width: 80px;
+  min-width: 80px;
+  cursor: pointer;
+}
+
+#calendar-select {
+  cursor: pointer;
 }
 
 .event-section textarea {

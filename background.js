@@ -40,6 +40,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
+  if (request.action === 'getCalendars') {
+    getCalendars().then(result => {
+      sendResponse(result);
+    });
+    return true;
+  }
+
+  if (request.action === 'getColors') {
+    getColors().then(result => {
+      sendResponse(result);
+    });
+    return true;
+  }
+
   if (request.action === 'createEvent') {
     createCalendarEvent(request.event).then(result => {
       sendResponse(result);
@@ -228,14 +242,89 @@ async function refreshAccessToken(refreshToken) {
   return data.access_token;
 }
 
+// Get user's calendar list
+async function getCalendars() {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch(
+      'https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=writer',
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to fetch calendars');
+    }
+
+    const data = await response.json();
+    const calendars = (data.items || []).map(item => ({
+      id: item.id,
+      summary: item.summary || item.id,
+      colorId: item.colorId || null,
+      backgroundColor: item.backgroundColor || null,
+      primary: item.primary === true
+    }));
+
+    return {
+      success: true,
+      calendars
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// Get event color palette
+async function getColors() {
+  try {
+    const token = await getAccessToken();
+    const response = await fetch(
+      'https://www.googleapis.com/calendar/v3/colors',
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to fetch colors');
+    }
+
+    const data = await response.json();
+    const eventColors = data.event || {};
+
+    return {
+      success: true,
+      colors: eventColors
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
 // Create calendar event
 async function createCalendarEvent(eventData) {
   try {
     const token = await getAccessToken();
+    const calendarId = eventData.calendarId || 'primary';
+    const encodedCalendarId = encodeURIComponent(calendarId);
     
     const event = {
       summary: eventData.title,
       description: eventData.description || '',
+      ...(eventData.colorId && { colorId: eventData.colorId }),
       start: {
         dateTime: new Date(eventData.start).toISOString(),
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -246,7 +335,7 @@ async function createCalendarEvent(eventData) {
       }
     };
 
-    const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+    const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodedCalendarId}/events`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
