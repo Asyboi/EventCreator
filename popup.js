@@ -28,7 +28,6 @@ const transcriptDisplay = document.getElementById('transcript-display');
 
 // Event creation elements
 const calendarSelect = document.getElementById('calendar-select');
-const colorSelect = document.getElementById('color-select');
 const eventTitleInput = document.getElementById('event-title');
 const eventStartInput = document.getElementById('event-start');
 const eventEndInput = document.getElementById('event-end');
@@ -38,33 +37,6 @@ const statusMessage = document.getElementById('status-message');
 
 let recognition = null;
 let isRecording = false;
-
-// Store default values for form reset
-let primaryCalendarId = 'primary';
-let primaryColorId = '1';
-
-// Event color names (fallback when API doesn't return)
-const EVENT_COLOR_NAMES = {
-  '1': 'Lavender',
-  '2': 'Sage',
-  '3': 'Grape',
-  '4': 'Flamingo',
-  '5': 'Banana',
-  '6': 'Tangerine',
-  '7': 'Peacock',
-  '8': 'Graphite',
-  '9': 'Blueberry',
-  '10': 'Basil',
-  '11': 'Tomato'
-};
-
-// Map calendar colorId (1-24) to event colorId (1-11)
-function mapCalendarColorToEventColor(calendarColorId) {
-  if (!calendarColorId) return '1';
-  const id = parseInt(calendarColorId, 10);
-  if (id >= 1 && id <= 11) return String(id);
-  return '1';
-}
 
 // Initialize Speech Recognition
 function initSpeechRecognition() {
@@ -128,68 +100,24 @@ function showMainSection() {
 
 function loadCalendars() {
   calendarSelect.innerHTML = '<option value="">Loading calendars...</option>';
-  colorSelect.innerHTML = '<option value="">Loading...</option>';
-
-  const colorsPromise = new Promise((resolve) => {
-    chrome.runtime.sendMessage({ action: 'getColors' }, (response) => {
-      resolve(response);
-    });
-  });
-
-  chrome.runtime.sendMessage({ action: 'getCalendars' }, (calResponse) => {
-    colorsPromise.then((colorResponse) => {
-      // Populate color dropdown
-      const eventColors = (colorResponse && colorResponse.success && colorResponse.colors) ? colorResponse.colors : {};
-      colorSelect.innerHTML = '<option value="">Color</option>';
-      for (let i = 1; i <= 11; i++) {
-        const id = String(i);
-        const colorDef = eventColors[id];
-        const name = EVENT_COLOR_NAMES[id] || `Color ${i}`;
+  chrome.runtime.sendMessage({ action: 'getCalendars' }, (response) => {
+    if (response && response.success && response.calendars) {
+      calendarSelect.innerHTML = '<option value="">Calendar</option>';
+      response.calendars.forEach(cal => {
         const option = document.createElement('option');
-        option.value = id;
-        option.textContent = name;
-        if (colorDef && colorDef.background) {
-          option.style.backgroundColor = colorDef.background;
-          option.style.color = colorDef.foreground || '#000';
-        }
-        colorSelect.appendChild(option);
+        option.value = cal.id;
+        option.textContent = cal.summary;
+        calendarSelect.appendChild(option);
+      });
+      if (response.calendars.length === 0) {
+        const option = document.createElement('option');
+        option.value = 'primary';
+        option.textContent = 'Primary';
+        calendarSelect.appendChild(option);
       }
-
-      // Populate calendar dropdown
-      if (calResponse && calResponse.success && calResponse.calendars) {
-        const calendars = calResponse.calendars;
-        const primaryCal = calendars.find(c => c.primary) || calendars[0];
-
-        calendarSelect.innerHTML = '<option value="">Calendar</option>';
-        calendars.forEach(cal => {
-          const option = document.createElement('option');
-          option.value = cal.id;
-          option.textContent = cal.summary;
-          calendarSelect.appendChild(option);
-        });
-
-        if (calendars.length === 0) {
-          const option = document.createElement('option');
-          option.value = 'primary';
-          option.textContent = 'Primary';
-          calendarSelect.appendChild(option);
-        }
-
-        // Set defaults: primary calendar and its color
-        if (primaryCal) {
-          primaryCalendarId = primaryCal.id;
-          primaryColorId = mapCalendarColorToEventColor(primaryCal.colorId);
-          calendarSelect.value = primaryCalendarId;
-          colorSelect.value = primaryColorId;
-        }
-      } else {
-        calendarSelect.innerHTML = '<option value="">Calendar</option><option value="primary">Primary (error loading list)</option>';
-        primaryCalendarId = 'primary';
-        primaryColorId = '1';
-        calendarSelect.value = 'primary';
-        colorSelect.value = '1';
-      }
-    });
+    } else {
+      calendarSelect.innerHTML = '<option value="">Calendar</option><option value="primary">Primary (error loading list)</option>';
+    }
   });
 }
 
@@ -299,8 +227,7 @@ createEventBtn.addEventListener('click', async () => {
       start,
       end,
       description,
-      calendarId: calendarSelect.value || 'primary',
-      colorId: colorSelect.value || undefined
+      calendarId: calendarSelect.value || 'primary'
     }
   }, (response) => {
     if (response && response.success) {
@@ -318,8 +245,9 @@ function clearForm() {
   eventEndInput.value = '';
   eventDescriptionInput.value = '';
   transcriptDisplay.textContent = '';
-  calendarSelect.value = primaryCalendarId;
-  colorSelect.value = primaryColorId;
+  if (calendarSelect.options.length > 0) {
+    calendarSelect.selectedIndex = 0;
+  }
 }
 
 function showStatus(message, type = 'info') {
